@@ -1,0 +1,74 @@
+{
+  "APP": {
+    "TITLE": "Personal Data App",
+    "LANGUAGE": "Language"
+  },
+  "COMMON": {
+    "NAME": "Name",
+    "BIRTH_DATE": "Birth Date",
+    "BAPTISM_DATE": "Baptism Date",
+    "MOBILE_PHONE": "Mobile Phone",
+    "HOME_PHONE": "Home Phone",
+    "ADDRESS": "Address",
+    "EMERGENCY_CONTACT": "Emergency Contact",
+    "LAST_VALIDATED": "Last Validated",
+    "LOADING": "Loading...",
+    "GO_BACK": "Go Back",
+    "SUBMIT": "Submit",
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "EDIT": "Edit",
+    "VALIDATE": "Validate",
+    "LOGOUT": "Logout",
+    "ERROR": {
+      "REQUIRED": "is required"
+    }
+  },
+  "INITIAL_FORM": {
+    "TITLE": "Personal Data Lookup",
+    "NAME_PLACEHOLDER": "Enter your full name",
+    "NAME_REQUIRED": "Name is required",
+    "BIRTH_DATE_REQUIRED": "Birth date is required"
+  },
+  "PERSONAL_DATA": {
+    "TITLE": "Personal Information",
+    "LOADING": "Loading personal data...",
+    "NOT_FOUND": "Could not find personal data. Please try again.",
+    "MISSING_INFO": "Missing required information. Please go back and try again.",
+    "VALIDATED": "Your personal data has been validated!",
+    "VALIDATION_FAILED": "Failed to validate your personal data. Please try again.",
+    "CANNOT_VALIDATE": "Cannot validate: User data is missing or invalid."
+  },
+  "EDIT_PERSONAL_DATA": {
+    "TITLE": "Edit Personal Information",
+    "LOADING": "Loading personal data...",
+    "NOT_FOUND": "Could not find personal data. Please try again.",
+    "MISSING_INFO": "Missing required information. Please go back and try again.",
+    "UPDATED": "Personal data updated successfully!",
+    "UPDATE_FAILED": "Failed to update personal data. Please try again.",
+    "NAME_REQUIRED": "Name is required",
+    "BIRTH_DATE_REQUIRED": "Birth date is required",
+    "MOBILE_PHONE_REQUIRED": "Mobile phone is required",
+    "ADDRESS_REQUIRED": "Address is required",
+    "EMERGENCY_CONTACT_REQUIRED": "Emergency contact is required"
+  },
+  "ADMIN_LOGIN": {
+    "TITLE": "Admin Login",
+    "USERNAME": "Username",
+    "PASSWORD": "Password",
+    "USERNAME_PLACEHOLDER": "Enter admin username",
+    "PASSWORD_PLACEHOLDER": "Enter password",
+    "USERNAME_REQUIRED": "Username is required",
+    "PASSWORD_REQUIRED": "Password is required",
+    "INVALID_CREDENTIALS": "Invalid username or password",
+    "BACK_TO_HOME": "Back to Home"
+  },
+  "ADMIN_DASHBOARD": {
+    "TITLE": "Admin Dashboard - All Users",
+    "CARD_VIEW": "Card View",
+    "TABLE_VIEW": "Table View",
+    "LOADING": "Loading users data...",
+    "LOAD_FAILED": "Failed to load users. Please try again.",
+    "NO_USERS": "No users found in the system."
+  }
+}
