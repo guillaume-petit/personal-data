@@ -50,6 +50,12 @@
                   "maximumError": "8kB"
                 }
               ],
+              "fileReplacements": [
+                {
+                  "replace": "proxy.conf.json",
+                  "with": "proxy.conf.prod.json"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
