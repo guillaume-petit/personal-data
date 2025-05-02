@@ -8,7 +8,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = '/api';
+  private apiUrl = '/api'; // Keep the relative path for proxy to work
 
   constructor(
     private http: HttpClient,
