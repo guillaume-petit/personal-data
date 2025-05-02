@@ -203,15 +203,16 @@ app.post('/api/admin/login', (req, res) => {
   }
 });
 
-// Serve static files from the Angular app in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('dist/personal-data'));
+const path = require('path');
 
-  // For any other routes, redirect to the index.html
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'dist', 'personal-data', 'index.html'));
-  });
-}
+// Serve static files from the Angular app
+app.use(express.static(path.join(__dirname, 'dist/personal-data-app')));
+
+// Add this AFTER all your other routes (API routes)
+// This catch-all route handler must be the last route
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist/personal-data-app/index.html'));
+});
 
 // Start the server
 app.listen(PORT, () => {
