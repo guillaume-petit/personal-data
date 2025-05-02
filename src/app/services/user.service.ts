@@ -3,12 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private apiUrl = '/api'; // Keep the relative path for proxy to work
+  private apiUrl = `${environment.apiUrl}/api`;
 
   constructor(
     private http: HttpClient,
