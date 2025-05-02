@@ -24,7 +24,7 @@ describe('AuthService', () => {
       imports: [HttpClientTestingModule],
       providers: [AuthService]
     });
-    
+
     service = TestBed.inject(AuthService);
     httpMock = TestBed.inject(HttpTestingController);
   });
@@ -40,10 +40,10 @@ describe('AuthService', () => {
   it('should check authentication state from localStorage on initialization', () => {
     // Arrange
     localStorage.getItem.and.returnValue('true');
-    
+
     // Act
     const newService = TestBed.inject(AuthService);
-    
+
     // Assert
     expect(localStorage.getItem).toHaveBeenCalledWith('isAuthenticated');
     expect(newService.isAuthenticated()).toBeTrue();
@@ -55,20 +55,21 @@ describe('AuthService', () => {
       success: true,
       message: 'Authentication successful'
     };
-    
+
     // Act
     service.login('admin', 'admin123').subscribe(response => {
       expect(response).toEqual(mockResponse);
     });
-    
+
     // Assert
     const req = httpMock.expectOne('/api/admin/login');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ username: 'admin', password: 'admin123' });
     req.flush(mockResponse);
-    
+
     expect(localStorage.setItem).toHaveBeenCalledWith('isAuthenticated', 'true');
     expect(localStorage.setItem).toHaveBeenCalledWith('username', 'admin');
+    expect(localStorage.setItem).toHaveBeenCalledWith('password', 'admin123');
     expect(service.isAuthenticated()).toBeTrue();
   });
 
@@ -78,7 +79,7 @@ describe('AuthService', () => {
       success: false,
       message: 'Invalid credentials'
     };
-    
+
     // Act & Assert
     service.login('wrong', 'credentials').subscribe({
       next: () => {},
@@ -86,10 +87,10 @@ describe('AuthService', () => {
         expect(error.message).toBe('Login failed');
       }
     });
-    
+
     const req = httpMock.expectOne('/api/admin/login');
     req.flush(mockResponse, { status: 401, statusText: 'Unauthorized' });
-    
+
     expect(localStorage.setItem).not.toHaveBeenCalled();
     expect(service.isAuthenticated()).toBeFalse();
   });
@@ -97,27 +98,33 @@ describe('AuthService', () => {
   it('should logout and clear authentication state', () => {
     // Act
     service.logout();
-    
+
     // Assert
     expect(localStorage.removeItem).toHaveBeenCalledWith('isAuthenticated');
     expect(localStorage.removeItem).toHaveBeenCalledWith('username');
+    expect(localStorage.removeItem).toHaveBeenCalledWith('password');
     expect(service.isAuthenticated()).toBeFalse();
   });
 
   it('should create authorization header with credentials', () => {
     // Arrange
-    localStorage.getItem.and.returnValue('admin');
-    
+    localStorage.getItem.and.callFake((key) => {
+      if (key === 'username') return 'admin';
+      if (key === 'password') return 'testpassword';
+      return null;
+    });
+
     // Act
     const headers = service.getAuthorizationHeader();
-    
+
     // Assert
     expect(localStorage.getItem).toHaveBeenCalledWith('username');
+    expect(localStorage.getItem).toHaveBeenCalledWith('password');
     expect(headers.get('Authorization')).toContain('Basic ');
-    
-    // Verify the base64 encoding (admin:admin123)
+
+    // Verify the base64 encoding (admin:testpassword)
     const base64Credentials = headers.get('Authorization')?.split(' ')[1];
     const decodedCredentials = atob(base64Credentials || '');
-    expect(decodedCredentials).toBe('admin:admin123');
+    expect(decodedCredentials).toBe('admin:testpassword');
   });
 });

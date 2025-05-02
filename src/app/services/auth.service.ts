@@ -30,6 +30,7 @@ export class AuthService {
           // Store authentication state
           localStorage.setItem('isAuthenticated', 'true');
           localStorage.setItem('username', username);
+          localStorage.setItem('password', password); // Store password for subsequent requests
           this.isAuthenticatedSubject.next(true);
         }
       }),
@@ -44,6 +45,7 @@ export class AuthService {
     // Clear authentication state
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('username');
+    localStorage.removeItem('password');
     this.isAuthenticatedSubject.next(false);
   }
 
@@ -53,7 +55,7 @@ export class AuthService {
 
   getAuthorizationHeader(): HttpHeaders {
     const username = localStorage.getItem('username') || '';
-    const password = 'admin123'; // In a real app, you wouldn't store the password like this
+    const password = localStorage.getItem('password') || '';
     const base64Credentials = btoa(`${username}:${password}`);
     return new HttpHeaders({
       'Authorization': `Basic ${base64Credentials}`
