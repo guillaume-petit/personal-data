@@ -203,8 +203,6 @@ app.post('/api/admin/login', (req, res) => {
   }
 });
 
-const path = require('path');
-
 // Serve static files from the Angular app
 app.use(express.static(path.join(__dirname, 'dist/personal-data-app')));
 
