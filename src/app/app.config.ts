@@ -5,8 +5,10 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { HttpClient } from '@angular/common/http';
+import { DateAdapter, MAT_DATE_LOCALE, MatNativeDateModule, MatDateFormats } from '@angular/material/core';
 
 import { routes } from './app.routes';
+import { DateLocaleService } from './services/date-locale.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
@@ -19,7 +21,9 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
     provideAnimations(),
+    { provide: MAT_DATE_LOCALE, useValue: 'zh-TW' }, // Default to Chinese
     importProvidersFrom(
+      MatNativeDateModule,
       TranslateModule.forRoot({
         loader: {
           provide: TranslateLoader,
@@ -27,6 +31,7 @@ export const appConfig: ApplicationConfig = {
           deps: [HttpClient]
         }
       })
-    )
+    ),
+    DateLocaleService // Initialize the service to listen for language changes
   ]
 };

@@ -25,12 +25,12 @@ export class AppComponent implements OnInit {
   currentLang: string;
 
   constructor(private translate: TranslateService) {
-    this.currentLang = 'en';
+    this.currentLang = 'zh-TW';
   }
 
   ngOnInit() {
     // Initialize the translation service
-    this.translate.setDefaultLang('en');
+    this.translate.setDefaultLang('zh-TW');
 
     // Try to get the language from localStorage
     const savedLang = localStorage.getItem('language');
