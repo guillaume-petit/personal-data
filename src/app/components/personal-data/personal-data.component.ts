@@ -40,13 +40,13 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
             <mat-list-item>
               <span matListItemTitle>{{ 'COMMON.BIRTH_DATE' | translate }}</span>
-              <span matListItemLine>{{ userData.birthDate | date:'mediumDate' }}</span>
+              <span matListItemLine>{{ userData.birthDate | date:'yyyy-MM-dd' }}</span>
             </mat-list-item>
             <mat-divider></mat-divider>
 
             <mat-list-item>
               <span matListItemTitle>{{ 'COMMON.BAPTISM_DATE' | translate }}</span>
-              <span matListItemLine>{{ userData.baptismDate | date:'mediumDate' }}</span>
+              <span matListItemLine>{{ userData.baptismDate | date:'yyyy-MM-dd' }}</span>
             </mat-list-item>
             <mat-divider></mat-divider>
 
@@ -76,7 +76,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
             <mat-list-item *ngIf="userData.lastValidatedDate">
               <span matListItemTitle>{{ 'COMMON.LAST_VALIDATED' | translate }}</span>
-              <span matListItemLine>{{ userData.lastValidatedDate | date:'medium' }}</span>
+              <span matListItemLine>{{ userData.lastValidatedDate | date:'yyyy-MM-dd' }}</span>
             </mat-list-item>
           </mat-list>
         </mat-card-content>

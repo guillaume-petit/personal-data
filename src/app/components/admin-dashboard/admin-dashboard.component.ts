@@ -76,13 +76,13 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
             <mat-list>
               <mat-list-item>
                 <span matListItemTitle>{{ 'COMMON.BIRTH_DATE' | translate }}</span>
-                <span matListItemLine>{{ user.birthDate | date:'mediumDate' }}</span>
+                <span matListItemLine>{{ user.birthDate | date:'yyyy-MM-dd' }}</span>
               </mat-list-item>
               <mat-divider></mat-divider>
 
               <mat-list-item>
                 <span matListItemTitle>{{ 'COMMON.BAPTISM_DATE' | translate }}</span>
-                <span matListItemLine>{{ user.baptismDate | date:'mediumDate' }}</span>
+                <span matListItemLine>{{ user.baptismDate | date:'yyyy-MM-dd' }}</span>
               </mat-list-item>
               <mat-divider></mat-divider>
 
@@ -111,7 +111,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
               <mat-list-item *ngIf="user.lastValidatedDate">
                 <span matListItemTitle>{{ 'COMMON.LAST_VALIDATED' | translate }}</span>
-                <span matListItemLine>{{ user.lastValidatedDate | date:'medium' }}</span>
+                <span matListItemLine>{{ user.lastValidatedDate | date:'yyyy-MM-dd' }}</span>
               </mat-list-item>
             </mat-list>
           </mat-card-content>
@@ -130,13 +130,13 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
           <!-- Birth Date Column -->
           <ng-container matColumnDef="birthDate">
             <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.BIRTH_DATE' | translate }}</th>
-            <td mat-cell *matCellDef="let user">{{ user.birthDate | date:'mediumDate' }}</td>
+            <td mat-cell *matCellDef="let user">{{ user.birthDate | date:'yyyy-MM-dd' }}</td>
           </ng-container>
 
           <!-- Baptism Date Column -->
           <ng-container matColumnDef="baptismDate">
             <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.BAPTISM_DATE' | translate }}</th>
-            <td mat-cell *matCellDef="let user">{{ user.baptismDate | date:'mediumDate' }}</td>
+            <td mat-cell *matCellDef="let user">{{ user.baptismDate | date:'yyyy-MM-dd' }}</td>
           </ng-container>
 
           <!-- Mobile Phone Column -->
@@ -166,7 +166,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
           <!-- Last Validated Column -->
           <ng-container matColumnDef="lastValidatedDate">
             <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.LAST_VALIDATED' | translate }}</th>
-            <td mat-cell *matCellDef="let user">{{ user.lastValidatedDate | date:'medium' }}</td>
+            <td mat-cell *matCellDef="let user">{{ user.lastValidatedDate | date:'yyyy-MM-dd' }}</td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
