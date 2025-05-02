@@ -1,39 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
 const path = require('path');
+require('dotenv').config();
 
-// Create a database adapter and initialize the database
-const adapter = new FileSync('db.json');
-const db = low(adapter);
-
-// Set default data
-db.defaults({
-  users: [
-    {
-      id: '1',
-      name: 'John Doe',
-      birthDate: '1990-05-15',
-      baptismDate: '1990-06-20',
-      mobilePhone: '555-123-4567',
-      homePhone: '555-987-6543',
-      address: '123 Main St, Anytown, USA',
-      emergencyContact: 'Jane Doe (Sister) - 555-765-4321'
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      birthDate: '1985-10-25',
-      baptismDate: '1986-01-15',
-      mobilePhone: '555-222-3333',
-      homePhone: '555-444-5555',
-      address: '456 Oak Ave, Somewhere, USA',
-      emergencyContact: 'John Smith (Brother) - 555-666-7777'
-    }
-  ]
-}).write();
+// Import database module (supports both Turso and local JSON database)
+const database = require('./db');
 
 // Initialize Express app
 const app = express();
@@ -86,41 +58,47 @@ const authenticateAdmin = (req, res, next) => {
 // API Routes
 
 // Get user by name and birth date
-app.get('/api/users', (req, res) => {
+app.get('/api/users', async (req, res) => {
   const { name, birthDate } = req.query;
 
   if (!name || !birthDate) {
     return res.status(400).json({ error: 'Name and birth date are required' });
   }
 
-  const user = db.get('users')
-    .find(u => u.name.toLowerCase() === name.toLowerCase() && u.birthDate === birthDate)
-    .value();
+  try {
+    const user = await database.getUserByNameAndBirthDate(name, birthDate);
 
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  res.json(user);
 });
 
 // Get user by ID
-app.get('/api/users/:id', (req, res) => {
+app.get('/api/users/:id', async (req, res) => {
   const { id } = req.params;
 
-  const user = db.get('users')
-    .find({ id })
-    .value();
+  try {
+    const user = await database.getUserById(id);
 
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  res.json(user);
 });
 
 // Update user
-app.put('/api/users/:id', (req, res) => {
+app.put('/api/users/:id', async (req, res) => {
   const { id } = req.params;
   const userData = req.body;
 
@@ -129,57 +107,53 @@ app.put('/api/users/:id', (req, res) => {
     return res.status(400).json({ error: 'ID mismatch' });
   }
 
-  // Check if user exists
-  const user = db.get('users')
-    .find({ id })
-    .value();
+  try {
+    // Check if user exists
+    const user = await database.getUserById(id);
 
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update user
+    const result = await database.updateUser(id, userData);
+    res.json(result);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  userData.lastValidatedDate = new Date().toISOString();
-
-  // Update user
-  db.get('users')
-    .find({ id })
-    .assign(userData)
-    .write();
-
-  res.json({ success: true, message: 'User updated successfully' });
 });
 
 // Validate user data
-app.post('/api/users/:id/validate', (req, res) => {
+app.post('/api/users/:id/validate', async (req, res) => {
   const { id } = req.params;
 
-  // Check if user exists
-  const user = db.get('users')
-    .find({ id })
-    .value();
+  try {
+    // Check if user exists
+    const user = await database.getUserById(id);
 
-  if (!user) {
-    return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update lastValidatedDate
+    const result = await database.validateUser(id);
+    res.json(result);
+  } catch (error) {
+    console.error('Error validating user:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
-
-  // Update lastValidatedDate
-  const lastValidatedDate = new Date().toISOString();
-  db.get('users')
-    .find({ id })
-    .assign({ lastValidatedDate })
-    .write();
-
-  res.json({ 
-    success: true, 
-    message: 'User data validated successfully',
-    lastValidatedDate
-  });
 });
 
 // Admin route to get all users (protected by authentication)
-app.get('/api/admin/users', authenticateAdmin, (req, res) => {
-  const users = db.get('users').value();
-  res.json(users);
+app.get('/api/admin/users', authenticateAdmin, async (req, res) => {
+  try {
+    const users = await database.getUsers();
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching all users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // Admin route to verify credentials (for frontend login)

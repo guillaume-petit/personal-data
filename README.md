@@ -15,12 +15,13 @@ A simple web application for managing personal data, optimized for mobile device
 
 - **Frontend**: Angular 19
 - **Backend**: Node.js with Express.js
-- **Storage**: LowDB (lightweight JSON database)
+- **Storage**: Turso (SQLite-compatible distributed database)
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - npm (v6 or higher)
+- Turso account (required for database)
 
 ## Installation
 
@@ -30,6 +31,23 @@ A simple web application for managing personal data, optimized for mobile device
 ```bash
 npm install
 ```
+
+3. Create a `.env` file in the root directory with the following content:
+
+```
+# Turso Database Configuration (required)
+TURSO_DATABASE_URL=your_turso_database_url
+TURSO_AUTH_TOKEN=your_turso_auth_token
+
+# Server Configuration
+PORT=3000
+
+# Admin Credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=admin123
+```
+
+If you're using Turso, fill in the `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` values as described in the [Database Configuration](#database-configuration) section.
 
 ## Running the Application
 
@@ -65,7 +83,7 @@ npm run server
 npm run server:dev
 ```
 
-This will start the backend server with nodemon, which automatically restarts the server when changes are detected. Nodemon is configured to ignore the db.json file to prevent restart loops that could occur when the database is updated.
+This will start the backend server with nodemon, which automatically restarts the server when changes are detected.
 
 ## Usage
 
@@ -137,6 +155,8 @@ This application is configured for easy deployment to [Render.com](https://rende
 4. Add the following environment variables:
    - `NODE_ENV`: Set to `production`
    - `PORT`: Render will set this automatically, but you can specify a custom port if needed
+   - `TURSO_DATABASE_URL`: Your Turso database URL (required for Turso database)
+   - `TURSO_AUTH_TOKEN`: Your Turso authentication token (required for Turso database)
    - `ADMIN_USERNAME`: Set a secure username for admin access (optional, defaults to 'admin')
    - `ADMIN_PASSWORD`: Set a secure password for admin access (optional, defaults to 'admin123')
    - `ALLOWED_ORIGINS`: Comma-separated list of allowed origins for CORS (optional, if not set, only same-origin requests will be allowed)
@@ -166,14 +186,62 @@ npm run start:prod
 
 This will serve the application exactly as it would be served in production, using the built Angular files from the dist directory.
 
-### Database Considerations
+### Database Configuration
 
-This application uses LowDB, a file-based JSON database. On Render.com, the filesystem is ephemeral, meaning any changes to files (including the database) will be lost when the service restarts or redeploys.
+The application uses [Turso](https://turso.tech/), a SQLite-compatible distributed database that provides:
+- Global distribution with low latency
+- High availability and durability
+- SQLite compatibility
 
-For a production environment, consider:
-1. Using a persistent database service like PostgreSQL, MongoDB, or a managed database service
-2. Implementing a database adapter in the application to connect to your chosen database
-3. Migrating data from the JSON file to your new database
+To set up Turso:
+
+1. Create a Turso account at [turso.tech](https://turso.tech/)
+2. Install the Turso CLI:
+   ```bash
+   curl -sSfL https://get.turso.tech/install.sh | bash
+   ```
+3. Authenticate with Turso:
+   ```bash
+   turso auth login
+   ```
+4. Create a new database:
+   ```bash
+   turso db create personal-data-app
+   ```
+5. Get your database URL:
+   ```bash
+   turso db show personal-data-app --url
+   ```
+6. Create an authentication token:
+   ```bash
+   turso db tokens create personal-data-app
+   ```
+7. Add these values to your `.env` file:
+   ```
+   TURSO_DATABASE_URL=your_database_url
+   TURSO_AUTH_TOKEN=your_auth_token
+   ```
+
+When deploying to Render.com, add these environment variables in the Render dashboard.
+
+#### Importing Data to Turso
+
+To import data to Turso, you can use the provided migration tools:
+
+1. Generate a complete SQL migration script:
+   ```bash
+   node generate-migration.js > migrate.sql
+   ```
+
+2. Run the migration script against your Turso database:
+   ```bash
+   turso db shell personal-data-app < migrate.sql
+   ```
+
+Alternatively, you can use the provided migrate.sql file which contains a subset of sample data:
+   ```bash
+   turso db shell personal-data-app < migrate.sql
+   ```
 
 ## Project Structure
 
@@ -189,6 +257,9 @@ For a production environment, consider:
 - `src/app/guards/` - Angular route guards
   - `auth.guard.ts` - Guard to protect admin routes
 - `server.js` - Express backend server
-- `db.json` - LowDB database file (created on first run)
+- `db.js` - Database module for Turso database
+- `.env` - Environment variables configuration file
+- `migrate.sql` - SQL script to create tables and import sample data to Turso
+- `generate-migration.js` - Node.js script to generate a complete SQL migration script
 - `server.test.js` - Backend API tests
 - `jest.config.js` - Jest configuration for backend tests
