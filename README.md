@@ -15,13 +15,13 @@ A simple web application for managing personal data, optimized for mobile device
 
 - **Frontend**: Angular 19
 - **Backend**: Node.js with Express.js
-- **Storage**: Turso (SQLite-compatible distributed database)
+- **Storage**: MySQL/MariaDB database
 
 ## Prerequisites
 
 - Node.js (v14 or higher)
 - npm (v6 or higher)
-- Turso account (required for database)
+- MySQL/MariaDB database (or Docker for running the included container)
 
 ## Installation
 
@@ -35,9 +35,11 @@ npm install
 3. Create a `.env` file in the root directory with the following content:
 
 ```
-# Turso Database Configuration (required)
-TURSO_DATABASE_URL=your_turso_database_url
-TURSO_AUTH_TOKEN=your_turso_auth_token
+# MySQL Database Configuration (required)
+MYSQL_HOST=localhost
+MYSQL_USER=personal-data
+MYSQL_PASSWORD=your_mysql_password
+MYSQL_DATABASE=personal-data
 
 # Server Configuration
 PORT=3000
@@ -47,7 +49,7 @@ ADMIN_USERNAME=admin
 ADMIN_PASSWORD=admin123
 ```
 
-If you're using Turso, fill in the `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` values as described in the [Database Configuration](#database-configuration) section.
+Fill in the MySQL configuration values as described in the [MySQL Database Configuration](#mysql-database-configuration) section.
 
 ## Running the Application
 
@@ -155,8 +157,10 @@ This application is configured for easy deployment to [Render.com](https://rende
 4. Add the following environment variables:
    - `NODE_ENV`: Set to `production`
    - `PORT`: Render will set this automatically, but you can specify a custom port if needed
-   - `TURSO_DATABASE_URL`: Your Turso database URL (required for Turso database)
-   - `TURSO_AUTH_TOKEN`: Your Turso authentication token (required for Turso database)
+   - `MYSQL_HOST`: Your MySQL host (e.g., MySQL database service URL)
+   - `MYSQL_USER`: Your MySQL username
+   - `MYSQL_PASSWORD`: Your MySQL password
+   - `MYSQL_DATABASE`: Your MySQL database name (typically 'personal-data')
    - `ADMIN_USERNAME`: Set a secure username for admin access (optional, defaults to 'admin')
    - `ADMIN_PASSWORD`: Set a secure password for admin access (optional, defaults to 'admin123')
    - `ALLOWED_ORIGINS`: Comma-separated list of allowed origins for CORS (optional, if not set, only same-origin requests will be allowed)
@@ -186,62 +190,65 @@ npm run start:prod
 
 This will serve the application exactly as it would be served in production, using the built Angular files from the dist directory.
 
-### Database Configuration
+### MySQL Database Configuration
 
-The application uses [Turso](https://turso.tech/), a SQLite-compatible distributed database that provides:
-- Global distribution with low latency
-- High availability and durability
-- SQLite compatibility
+The application uses MySQL/MariaDB database for storing personal data. You have two options for setting up the database:
 
-To set up Turso:
+#### Option 1: Using Docker Compose (Recommended)
 
-1. Create a Turso account at [turso.tech](https://turso.tech/)
-2. Install the Turso CLI:
+The easiest way to set up the database is using Docker Compose, which is included in the project:
+
+1. Make sure you have Docker and Docker Compose installed on your system
+2. Start the MySQL container using Docker Compose:
    ```bash
-   curl -sSfL https://get.turso.tech/install.sh | bash
+   docker-compose up -d
    ```
-3. Authenticate with Turso:
-   ```bash
-   turso auth login
+3. This will create a MariaDB container with the following configuration:
+   - Database name: personal-data
+   - Username: personal-data
+   - Password: Ll0X6UjXvw8u (you should change this in production)
+   - Port: 3306
+4. Update your `.env` file with these values:
    ```
-4. Create a new database:
-   ```bash
-   turso db create personal-data-app
-   ```
-5. Get your database URL:
-   ```bash
-   turso db show personal-data-app --url
-   ```
-6. Create an authentication token:
-   ```bash
-   turso db tokens create personal-data-app
-   ```
-7. Add these values to your `.env` file:
-   ```
-   TURSO_DATABASE_URL=your_database_url
-   TURSO_AUTH_TOKEN=your_auth_token
+   MYSQL_HOST=localhost
+   MYSQL_USER=personal-data
+   MYSQL_PASSWORD=Ll0X6UjXvw8u
+   MYSQL_DATABASE=personal-data
    ```
 
-When deploying to Render.com, add these environment variables in the Render dashboard.
+#### Option 2: Using an Existing MySQL/MariaDB Server
 
-#### Importing Data to Turso
+If you already have a MySQL or MariaDB server:
 
-To import data to Turso, you can use the provided migration tools:
-
-1. Generate a complete SQL migration script:
-   ```bash
-   node generate-migration.js > migrate.sql
+1. Create a new database:
+   ```sql
+   CREATE DATABASE `personal-data`;
+   ```
+2. Create a new user with appropriate permissions:
+   ```sql
+   CREATE USER 'personal-data'@'%' IDENTIFIED BY 'your_password';
+   GRANT ALL PRIVILEGES ON `personal-data`.* TO 'personal-data'@'%';
+   FLUSH PRIVILEGES;
+   ```
+3. Update your `.env` file with your database details:
+   ```
+   MYSQL_HOST=your_mysql_host
+   MYSQL_USER=personal-data
+   MYSQL_PASSWORD=your_password
+   MYSQL_DATABASE=personal-data
    ```
 
-2. Run the migration script against your Turso database:
+#### Importing Data to MySQL
+
+To import the sample data to your MySQL database:
+
+1. If using Docker Compose, the database will be initialized automatically when first started
+2. If using an existing MySQL server, you can import the provided migration script:
    ```bash
-   turso db shell personal-data-app < migrate.sql
+   mysql -u personal-data -p personal-data < mysql-migration.sql
    ```
 
-Alternatively, you can use the provided migrate.sql file which contains a subset of sample data:
-   ```bash
-   turso db shell personal-data-app < migrate.sql
-   ```
+The application will also automatically create the necessary tables if they don't exist when it starts up.
 
 ## Project Structure
 
@@ -257,9 +264,11 @@ Alternatively, you can use the provided migrate.sql file which contains a subset
 - `src/app/guards/` - Angular route guards
   - `auth.guard.ts` - Guard to protect admin routes
 - `server.js` - Express backend server
-- `db.js` - Database module for Turso database
+- `db.js` - Database module for MySQL database
 - `.env` - Environment variables configuration file
-- `migrate.sql` - SQL script to create tables and import sample data to Turso
+- `docker-compose.yml` - Docker Compose configuration for MySQL database
+- `mysql-migration.sql` - SQL script to create tables and import sample data to MySQL
+- `migration.sql` - Original SQL script for Turso (kept for reference)
 - `generate-migration.js` - Node.js script to generate a complete SQL migration script
 - `server.test.js` - Backend API tests
 - `jest.config.js` - Jest configuration for backend tests

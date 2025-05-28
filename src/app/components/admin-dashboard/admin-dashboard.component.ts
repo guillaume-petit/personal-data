@@ -113,6 +113,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
                 <span matListItemTitle>{{ 'COMMON.LAST_VALIDATED' | translate }}</span>
                 <span matListItemLine>{{ user.lastValidatedDate | date:'yyyy-MM-dd' }}</span>
               </mat-list-item>
+              <mat-divider *ngIf="user.lastValidatedDate"></mat-divider>
+
+              <mat-list-item *ngIf="user.lastUpdateDate">
+                <span matListItemTitle>{{ 'COMMON.LAST_UPDATED' | translate }}</span>
+                <span matListItemLine>{{ user.lastUpdateDate | date:'yyyy-MM-dd' }}</span>
+              </mat-list-item>
             </mat-list>
           </mat-card-content>
         </mat-card>
@@ -167,6 +173,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
           <ng-container matColumnDef="lastValidatedDate">
             <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.LAST_VALIDATED' | translate }}</th>
             <td mat-cell *matCellDef="let user">{{ user.lastValidatedDate | date:'yyyy-MM-dd' }}</td>
+          </ng-container>
+
+          <!-- Last Updated Column -->
+          <ng-container matColumnDef="lastUpdateDate">
+            <th mat-header-cell *matHeaderCellDef>{{ 'COMMON.LAST_UPDATED' | translate }}</th>
+            <td mat-cell *matCellDef="let user">{{ user.lastUpdateDate | date:'yyyy-MM-dd' }}</td>
           </ng-container>
 
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -302,7 +314,7 @@ export class AdminDashboardComponent implements OnInit {
   loading = true;
   error: string | null = null;
   viewMode: 'card' | 'table' = 'card';
-  displayedColumns: string[] = ['name', 'birthDate', 'baptismDate', 'mobilePhone', 'homePhone', 'address', 'emergencyContact', 'lastValidatedDate'];
+  displayedColumns: string[] = ['name', 'birthDate', 'baptismDate', 'mobilePhone', 'homePhone', 'address', 'emergencyContact', 'lastValidatedDate', 'lastUpdateDate'];
 
   constructor(
     private userService: UserService,

@@ -78,6 +78,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
               <span matListItemTitle>{{ 'COMMON.LAST_VALIDATED' | translate }}</span>
               <span matListItemLine>{{ userData.lastValidatedDate | date:'yyyy-MM-dd' }}</span>
             </mat-list-item>
+            <mat-divider *ngIf="userData.lastValidatedDate"></mat-divider>
+
+            <mat-list-item *ngIf="userData.lastUpdateDate">
+              <span matListItemTitle>{{ 'COMMON.LAST_UPDATED' | translate }}</span>
+              <span matListItemLine>{{ userData.lastUpdateDate | date:'yyyy-MM-dd' }}</span>
+            </mat-list-item>
           </mat-list>
         </mat-card-content>
 
