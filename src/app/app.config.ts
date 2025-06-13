@@ -1,13 +1,14 @@
-import {ApplicationConfig, importProvidersFrom, provideZoneChangeDetection} from '@angular/core';
-import {provideRouter} from '@angular/router';
-import {HttpClient, provideHttpClient, withInterceptorsFromDi} from '@angular/common/http';
-import {provideAnimations} from '@angular/platform-browser/animations';
-import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
-import {MAT_DATE_LOCALE, MatNativeDateModule} from '@angular/material/core';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HttpClient } from '@angular/common/http';
+import { DateAdapter, MAT_DATE_LOCALE, MatNativeDateModule, MatDateFormats } from '@angular/material/core';
 
-import {routes} from './app.routes';
-import {DateLocaleService} from './services/date-locale.service';
+import { routes } from './app.routes';
+import { DateLocaleService } from './services/date-locale.service';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {

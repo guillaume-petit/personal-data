@@ -9,7 +9,6 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
-import {NgxMaskDirective, provideNgxMask} from "ngx-mask";
 
 interface UserData {
   name: string;
@@ -28,11 +27,7 @@ interface UserData {
     MatDatepickerModule, 
     MatNativeDateModule, 
     MatButtonModule,
-    TranslateModule,
-    NgxMaskDirective
-  ],
-  providers: [
-    provideNgxMask()
+    TranslateModule
   ],
   template: `
     <div class="container">
@@ -51,28 +46,19 @@ interface UserData {
                 [(ngModel)]="userData.name" 
                 required 
                 placeholder="{{ 'INITIAL_FORM.NAME_PLACEHOLDER' | translate }}">
-                <mat-error *ngIf="initialForm.controls['name']?.invalid">{{ 'INITIAL_FORM.NAME_REQUIRED' | translate }}</mat-error>
+              <mat-error *ngIf="initialForm.controls['name']?.invalid">{{ 'INITIAL_FORM.NAME_REQUIRED' | translate }}</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>{{ 'COMMON.BIRTH_DATE' | translate }}</mat-label>
-              <input
-                      matInput
-                      type="text"
-                      name="birthDateMasked"
-                      [(ngModel)]="birthDateMasked"
-                      mask="0000/00/00"
-                      placeholder="YYYY/MM/DD"
-                      (blur)="updateDateFromMask()"
-                      required>
-              <input
-                  [hidden]="true"
-                  [matDatepicker]="birthDatePicker"
-                  name="birthDate"
-                  [(ngModel)]="userData.birthDate"
-                  (dateChange)="updateMaskFromDate()">
-              <mat-datepicker-toggle matIconSuffix [for]="birthDatePicker"></mat-datepicker-toggle>
-              <mat-datepicker #birthDatePicker></mat-datepicker>
+              <input 
+                matInput
+                [matDatepicker]="picker"
+                name="birthDate" 
+                [(ngModel)]="userData.birthDate" 
+                required>
+              <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
               <mat-error *ngIf="initialForm.controls['birthDate']?.invalid">{{ 'INITIAL_FORM.BIRTH_DATE_REQUIRED' | translate }}</mat-error>
             </mat-form-field>
 
@@ -126,7 +112,6 @@ export class InitialFormComponent {
     name: '',
     birthDate: ''
   };
-  birthDateMasked: string = '';
 
   constructor(private router: Router) {}
 
@@ -148,53 +133,5 @@ export class InitialFormComponent {
         birthDate: formattedDate 
       } 
     });
-  }
-
-  // Update mask value when date changes
-  updateMaskFromDate(): void {
-    if (!this.userData || !this.userData.birthDate) return;
-
-    const date = this.userData.birthDate instanceof Date
-      ? this.userData.birthDate
-      : new Date(this.userData.birthDate);
-
-    if (!isNaN(date.getTime())) {
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const year = date.getFullYear();
-
-      this.birthDateMasked = `${year}/${month}/${day}`;
-    }
-  }
-
-  // Update date value when mask input changes
-  updateDateFromMask(): void {
-    const maskedValue = this.birthDateMasked;
-
-    if (maskedValue && maskedValue.length === 10) {
-      const [year, month, day] = maskedValue.split('/').map(Number);
-
-      // Validate date parts
-      if (
-        month >= 1 && month <= 12 &&
-        day >= 1 && day <= 31 &&
-        year >= 1900 && year <= 2100
-      ) {
-        const date = new Date(year, month - 1, day);
-
-        // Additional validation to ensure the resulting date is valid
-        if (
-          date.getFullYear() === year &&
-          date.getMonth() === month - 1 &&
-          date.getDate() === day
-        ) {
-          this.userData.birthDate = date;
-          return;
-        }
-      }
-    }
-
-    // If invalid, update mask to reflect the current valid date
-    this.updateMaskFromDate();
   }
 }
